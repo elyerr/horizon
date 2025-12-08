@@ -113,45 +113,62 @@ class Horizon
 
     /**
      * Get the CSS for the Horizon dashboard.
-     *
-     * @return Illuminate\Contracts\Support\Htmlable
+     * @param string $nonce
+     * @throws RuntimeException
+     * @return HtmlString
      */
-    public static function css()
+    public static function css(string $nonce = '')
     {
-        if (($light = @file_get_contents(__DIR__.'/../dist/styles.css')) === false) {
+        if (($light = @file_get_contents(__DIR__ . '/../dist/styles.css')) === false) {
             throw new RuntimeException('Unable to load the Horizon dashboard light CSS.');
         }
 
-        if (($dark = @file_get_contents(__DIR__.'/../dist/styles-dark.css')) === false) {
+        if (($dark = @file_get_contents(__DIR__ . '/../dist/styles-dark.css')) === false) {
             throw new RuntimeException('Unable to load the Horizon dashboard dark CSS.');
         }
 
-        if (($app = @file_get_contents(__DIR__.'/../dist/app.css')) === false) {
+        if (($app = @file_get_contents(__DIR__ . '/../dist/app.css')) === false) {
             throw new RuntimeException('Unable to load the Horizon dashboard CSS.');
         }
 
-        return new HtmlString(<<<HTML
-            <style data-scheme="light">{$light}</style>
-            <style data-scheme="dark">{$dark}</style>
+        //create nonce attr
+        $nonceAttr = "nonce={$nonce}";
+
+        return empty($nonce) ? new HtmlString(<<<HTML
+            <style  data-scheme="light">{$light}</style>
+            <style  data-scheme="dark">{$dark}</style>
             <style>{$app}</style>
+            HTML) :
+            new HtmlString(<<<HTML
+            <style {$nonceAttr} data-scheme="light">{$light}</style>
+            <style {$nonceAttr} data-scheme="dark">{$dark}</style>
+            <style {$nonceAttr}>{$app}</style>
             HTML);
     }
 
     /**
      * Get the JS for the Horizon dashboard.
      *
+     * @param string $nonce
      * @return \Illuminate\Contracts\Support\Htmlable
      */
-    public static function js()
+    public static function js(string $nonce = '')
     {
-        if (($js = @file_get_contents(__DIR__.'/../dist/app.js')) === false) {
+        if (($js = @file_get_contents(__DIR__ . '/../dist/app.js')) === false) {
             throw new RuntimeException('Unable to load the Horizon dashboard JavaScript.');
         }
 
+        $nonceAttr = "nonce={$nonce}";
+
         $horizon = Js::from(static::scriptVariables());
 
-        return new HtmlString(<<<HTML
+        return empty($nonce) ? new HtmlString(<<<HTML
             <script type="module">
+                window.Horizon = {$horizon};
+                {$js}
+            </script>
+            HTML) : new HtmlString(<<<HTML
+            <script {$nonceAttr} type="module">
                 window.Horizon = {$horizon};
                 {$js}
             </script>
