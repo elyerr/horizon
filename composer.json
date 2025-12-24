@@ -1,6 +1,6 @@
 {
-    "name": "laravel/horizon",
-    "description": "Dashboard and code-driven configuration for Laravel queues.",
+    "name": "elyerr/horizon",
+    "description": "Dashboard and code-driven configuration for Laravel queues with CSP support",
     "keywords": ["laravel", "queue"],
     "license": "MIT",
     "authors": [
